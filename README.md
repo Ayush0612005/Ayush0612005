@@ -1,6 +1,5 @@
 <div align="center">
 
-<<<<<<< HEAD
 <img src="./assets/portrait/portrait.svg" width="700" alt="Animated ASCII portrait of Ayush Kulshreshtha">
 
 <br>
@@ -47,13 +46,13 @@ Java · Spring Boot · Spring Security · MySQL · Redis · Kafka · REST APIs �
 
 ## <samp>projects</samp>
 
-**Library Management System**
+**Library Management System**  
 Spring Boot · Spring Data JPA · MySQL · Spring Security · JWT · Swagger
 
-**Expense Tracker**
+**Expense Tracker**  
 Spring Boot · JWT · MySQL · Redis · Kafka · REST API
 
-**URL Shortener**
+**URL Shortener**  
 Spring Boot · JWT · Redis · MySQL · Swagger · JUnit
 
 <br>
@@ -78,39 +77,3 @@ to work with experienced maintainers.
 <samp>More coming soon.</samp>
 
 </div>
-
-
-=======
-# AYUSH KULSHRESTHA
-
-`JAVA BACKEND DEVELOPER` · `OPEN SOURCE` · `DSA`
-
-</div>
-
-<br>
-
-> Building backend systems, learning by shipping, and contributing to open source.
-
-<br>
-
-## `ABOUT`
-
-I'm a Java developer focused on building reliable backend applications with
-**Java, Spring Boot, MySQL, Redis and Kafka**.
-
-Currently sharpening my **DSA**, exploring **system design**, and actively
-looking for opportunities to contribute to meaningful open-source projects.
-
-<br>
-
-## `TECHNOLOGY`
-
-```text
-JAVA          ████████████████████
-SPRING BOOT   ██████████████████
-MYSQL         ███████████████
-REDIS         ███████████
-KAFKA         █████████
-JAVASCRIPT    ███████
-PYTHON        █████
->>>>>>> 1a29788 (Build self-generated profile foundation)
