@@ -1,0 +1,9 @@
+# Private source photograph
+assets/portrait/source.jpg
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local rembg/model files
+.rembg/
