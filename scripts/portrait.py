@@ -10,7 +10,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 
-SOURCE = ROOT / "assets" / "portrait" / "source.jpg"
+SOURCE = ROOT / "assets" / "portrait" / "source.jpeg"
 OUTPUT = ROOT / "assets" / "portrait" / "portrait.txt"
 
 # Width of the final ASCII portrait
@@ -112,7 +112,6 @@ def prepare_image(image: np.ndarray) -> np.ndarray:
     gray[background_mask] = 255
 
     return gray
-
 
 # =========================================================
 # Crop

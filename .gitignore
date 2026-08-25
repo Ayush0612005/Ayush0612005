@@ -1,5 +1,9 @@
 # Private source photograph
-assets/portrait/source.jpg
+assets/portrait/source.jpeg
+
+# Windows
+desktop.ini
+Thumbs.db
 
 # Python cache
 __pycache__/
