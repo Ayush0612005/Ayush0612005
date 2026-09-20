@@ -1,0 +1,57 @@
+<svg width="900" height="420" viewBox="0 0 900 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+    <feGaussianBlur stdDeviation="4" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<rect x="1" y="1" width="898" height="418" rx="10" fill="#0D1117" stroke="#30363D"/>
+
+<text x="30" y="40" fill="#F0F6FC" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="600">GitHub Activity</text>
+<text x="30" y="64" fill="#8B949E" font-family="Arial,Helvetica,sans-serif" font-size="12">Contribution breakdown · all time</text>
+
+<!-- Radar / plus axes: these are reference axes, not bars -->
+<g transform="translate(450 232)">
+  <line x1="0" y1="-145" x2="0" y2="145" stroke="#30363D" stroke-width="1"/>
+  <line x1="-145" y1="0" x2="145" y2="0" stroke="#30363D" stroke-width="1"/>
+
+  <circle r="42" fill="none" stroke="#21262D"/>
+  <circle r="82" fill="none" stroke="#21262D"/>
+  <circle r="122" fill="none" stroke="#21262D"/>
+
+  <!-- Dynamic contribution points. Position is proportional to each category's share. -->
+  <circle cx="{{COMMIT_X}}" cy="0" r="5.5" fill="#39D353" filter="url(#glow)"/>
+  <circle cx="0" cy="{{REVIEW_Y}}" r="5.5" fill="#39D353" filter="url(#glow)"/>
+  <circle cx="{{PR_X}}" cy="0" r="5.5" fill="#39D353" filter="url(#glow)"/>
+  <circle cx="0" cy="{{ISSUE_Y}}" r="5.5" fill="#39D353" filter="url(#glow)"/>
+
+  <circle r="3" fill="#39D353"/>
+
+  <!-- labels -->
+  <text x="{{COMMIT_LABEL_X}}" y="-10" text-anchor="middle" fill="#F0F6FC"
+        font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="600">{{COMMIT_PCT}}%</text>
+  <text x="{{COMMIT_LABEL_X}}" y="12" text-anchor="middle" fill="#8B949E"
+        font-family="Arial,Helvetica,sans-serif" font-size="13">Commits · {{COMMITS}}</text>
+
+  <text x="0" y="{{REVIEW_LABEL_Y}}" text-anchor="middle" fill="#F0F6FC"
+        font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="600">{{REVIEW_PCT}}%</text>
+  <text x="0" y="{{REVIEW_LABEL_Y2}}" text-anchor="middle" fill="#8B949E"
+        font-family="Arial,Helvetica,sans-serif" font-size="13">Code review · {{REVIEWS}}</text>
+
+  <text x="{{PR_LABEL_X}}" y="-10" text-anchor="middle" fill="#F0F6FC"
+        font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="600">{{PR_PCT}}%</text>
+  <text x="{{PR_LABEL_X}}" y="12" text-anchor="middle" fill="#8B949E"
+        font-family="Arial,Helvetica,sans-serif" font-size="13">Pull requests · {{PRS}}</text>
+
+  <text x="0" y="{{ISSUE_LABEL_Y}}" text-anchor="middle" fill="#F0F6FC"
+        font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="600">{{ISSUE_PCT}}%</text>
+  <text x="0" y="{{ISSUE_LABEL_Y2}}" text-anchor="middle" fill="#8B949E"
+        font-family="Arial,Helvetica,sans-serif" font-size="13">Issues · {{ISSUES}}</text>
+</g>
+
+<text x="450" y="382" text-anchor="middle" fill="#8B949E"
+      font-family="Arial,Helvetica,sans-serif" font-size="11">
+  {{TOTAL}} total contributions · automatically updated by GitHub Actions
+</text>
+</svg>
