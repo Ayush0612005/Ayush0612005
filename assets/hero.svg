@@ -1,0 +1,76 @@
+<svg width="1400" height="390" viewBox="0 0 1400 390" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="45%" r="80%">
+    <stop offset="0%" stop-color="#16191D"/>
+    <stop offset="55%" stop-color="#0D1117"/>
+    <stop offset="100%" stop-color="#050608"/>
+  </radialGradient>
+  <linearGradient id="fade" x1="0" y1="0" x2="900" y2="0" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#FFFFFF" stop-opacity=".0"/>
+    <stop offset=".45" stop-color="#FFFFFF" stop-opacity=".55"/>
+    <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+  </linearGradient>
+  <filter id="softGlow">
+    <feGaussianBlur stdDeviation="2.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<rect width="1400" height="390" rx="18" fill="url(#bg)"/>
+
+<!-- star field -->
+<g fill="#FFFFFF">
+  <circle cx="74" cy="58" r="1.2" opacity=".8"/>
+  <circle cx="142" cy="245" r="1" opacity=".55"/>
+  <circle cx="218" cy="91" r="1.5" opacity=".7"/>
+  <circle cx="305" cy="305" r="1" opacity=".5"/>
+  <circle cx="387" cy="54" r="1" opacity=".75"/>
+  <circle cx="470" cy="128" r="1.2" opacity=".45"/>
+  <circle cx="565" cy="38" r="1" opacity=".65"/>
+  <circle cx="670" cy="286" r="1.2" opacity=".55"/>
+  <circle cx="754" cy="75" r="1" opacity=".8"/>
+  <circle cx="830" cy="322" r="1.4" opacity=".55"/>
+  <circle cx="925" cy="48" r="1" opacity=".7"/>
+  <circle cx="1010" cy="108" r="1.2" opacity=".55"/>
+  <circle cx="1110" cy="300" r="1" opacity=".65"/>
+  <circle cx="1210" cy="68" r="1.5" opacity=".7"/>
+  <circle cx="1308" cy="220" r="1" opacity=".55"/>
+</g>
+
+<!-- subtle orbital paths -->
+<g fill="none" stroke="#FFFFFF" stroke-opacity=".11">
+  <ellipse cx="1060" cy="210" rx="305" ry="116" transform="rotate(-13 1060 210)"/>
+  <ellipse cx="1060" cy="210" rx="250" ry="91" transform="rotate(18 1060 210)"/>
+</g>
+
+<!-- distant planet -->
+<circle cx="1200" cy="312" r="86" fill="#0A0C0F" stroke="#FFFFFF" stroke-opacity=".24"/>
+<path d="M1125 318C1164 289 1238 281 1280 304" stroke="#FFFFFF" stroke-opacity=".12" stroke-width="2"/>
+<path d="M1137 344C1184 317 1245 319 1274 334" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1.5"/>
+
+<!-- satellite -->
+<g transform="translate(1040 83) rotate(-13)">
+  <rect x="-25" y="-13" width="50" height="26" rx="4" fill="#D8D8D8"/>
+  <rect x="-67" y="-9" width="36" height="18" fill="#24272B" stroke="#FFFFFF" stroke-opacity=".45"/>
+  <rect x="31" y="-9" width="36" height="18" fill="#24272B" stroke="#FFFFFF" stroke-opacity=".45"/>
+  <path d="M0 13V38" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="2"/>
+  <circle cx="0" cy="42" r="4" fill="#FFFFFF" opacity=".8" filter="url(#softGlow)"/>
+  <path d="M-4 42H4" stroke="#FFFFFF" stroke-width="1"/>
+</g>
+
+<!-- content -->
+<text x="78" y="98" fill="#FFFFFF" fill-opacity=".72" font-family="Arial, Helvetica, sans-serif" font-size="14" letter-spacing="4">JAVA BACKEND · SOFTWARE ENGINEERING</text>
+<text x="75" y="164" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" letter-spacing="4">AYUSH KULSHRESTHA</text>
+<line x1="78" y1="188" x2="665" y2="188" stroke="url(#fade)" stroke-width="1"/>
+<text x="78" y="225" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="21">Java Backend Developer</text>
+<text x="78" y="263" fill="#FFFFFF" fill-opacity=".72" font-family="Arial, Helvetica, sans-serif" font-size="15">Building reliable backend systems with Java &amp; Spring Boot.</text>
+<text x="78" y="292" fill="#FFFFFF" fill-opacity=".45" font-family="Arial, Helvetica, sans-serif" font-size="12" letter-spacing="2">DSA  ·  OPEN SOURCE  ·  DISTRIBUTED SYSTEMS</text>
+
+<!-- tiny navigation-like coordinate mark -->
+<g stroke="#FFFFFF" stroke-opacity=".25">
+  <line x1="78" y1="334" x2="145" y2="334"/>
+  <line x1="78" y1="330" x2="78" y2="338"/>
+  <line x1="145" y1="330" x2="145" y2="338"/>
+</g>
+<text x="157" y="338" fill="#FFFFFF" fill-opacity=".38" font-family="Arial, Helvetica, sans-serif" font-size="10" letter-spacing="2">SRMIST · KTR</text>
+</svg>
