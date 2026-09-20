@@ -1,0 +1,111 @@
+name: Update GitHub Activity
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-activity:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout profile
+        uses: actions/checkout@v4
+
+      - name: Generate activity SVG
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs");
+
+            const login = context.repo.owner;
+
+            const query = `
+              query($login: String!) {
+                user(login: $login) {
+                  contributionsCollection {
+                    totalCommitContributions
+                    totalPullRequestContributions
+                    totalPullRequestReviewContributions
+                    totalIssueContributions
+                  }
+                  repositories(first: 1) {
+                    totalCount
+                  }
+                }
+              }
+            `;
+
+            const data = await github.graphql(query, { login });
+            const c = data.user.contributionsCollection;
+
+            const commits = c.totalCommitContributions;
+            const prs = c.totalPullRequestContributions;
+            const reviews = c.totalPullRequestReviewContributions;
+            const issues = c.totalIssueContributions;
+
+            const total = commits + prs + reviews + issues;
+
+            const pct = (value) => total === 0 ? 0 : Math.round((value / total) * 100);
+
+            const commitPct = pct(commits);
+            const prPct = pct(prs);
+            const reviewPct = pct(reviews);
+            const issuePct = pct(issues);
+
+            const bar = (value, maxWidth = 412) => {
+              const width = total === 0 ? 0 : Math.max(4, Math.round((value / total) * maxWidth));
+              return `<line x1="428" y1="Y" x2="${428 + width}" y2="Y" stroke="#F0F6FC" stroke-width="8" stroke-linecap="round"/>`;
+            };
+
+            const svg = `
+            <svg width="900" height="390" viewBox="0 0 900 390" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="1" width="898" height="388" rx="10" fill="#0D1117" stroke="#30363D"/>
+              <text x="28" y="40" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="600">Activity overview</text>
+              <text x="28" y="65" fill="#8B949E" font-family="Arial, Helvetica, sans-serif" font-size="12">Last year · GitHub contribution statistics</text>
+              <line x1="28" y1="88" x2="872" y2="88" stroke="#30363D"/>
+
+              <text x="28" y="124" fill="#8B949E" font-family="Arial, Helvetica, sans-serif" font-size="12">CONTRIBUTIONS</text>
+              <text x="28" y="161" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700">${total}</text>
+              <text x="28" y="187" fill="#8B949E" font-family="Arial, Helvetica, sans-serif" font-size="12">commits · pull requests · reviews · issues</text>
+
+              <line x1="390" y1="110" x2="390" y2="320" stroke="#30363D"/>
+              <text x="428" y="124" fill="#8B949E" font-family="Arial, Helvetica, sans-serif" font-size="12">ACTIVITY BREAKDOWN</text>
+
+              <text x="428" y="164" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="15">Commits</text>
+              <text x="840" y="164" text-anchor="end" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="15">${commitPct}%</text>
+              <line x1="428" y1="178" x2="840" y2="178" stroke="#21262D" stroke-width="8" stroke-linecap="round"/>
+              ${bar(commits).replaceAll("Y","178")}
+
+              <text x="428" y="214" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="15">Pull requests</text>
+              <text x="840" y="214" text-anchor="end" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="15">${prPct}%</text>
+              <line x1="428" y1="228" x2="840" y2="228" stroke="#21262D" stroke-width="8" stroke-linecap="round"/>
+              ${bar(prs).replaceAll("Y","228")}
+
+              <text x="428" y="264" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="15">Code reviews</text>
+              <text x="840" y="264" text-anchor="end" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="15">${reviewPct}%</text>
+              <line x1="428" y1="278" x2="840" y2="278" stroke="#21262D" stroke-width="8" stroke-linecap="round"/>
+              ${bar(reviews).replaceAll("Y","278")}
+
+              <text x="428" y="314" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="15">Issues</text>
+              <text x="840" y="314" text-anchor="end" fill="#F0F6FC" font-family="Arial, Helvetica, sans-serif" font-size="15">${issuePct}%</text>
+              <line x1="428" y1="328" x2="840" y2="328" stroke="#21262D" stroke-width="8" stroke-linecap="round"/>
+              ${bar(issues).replaceAll("Y","328")}
+
+              <text x="28" y="350" fill="#8B949E" font-family="Arial, Helvetica, sans-serif" font-size="11">Automatically updated by GitHub Actions</text>
+            </svg>`;
+
+            fs.writeFileSync("assets/github-activity.svg", svg.trim());
+
+      - name: Commit updated activity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/github-activity.svg
+          git diff --cached --quiet || git commit -m "chore: update GitHub activity"
+          git push
