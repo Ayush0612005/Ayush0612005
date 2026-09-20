@@ -1,69 +1,211 @@
-name: Update GitHub Activity
+name: Update activity radar
 
 on:
   schedule:
-    - cron: "17 2 * * *"
+    - cron: "17 3 * * *"
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/update-activity-radar.yml
 
 permissions:
   contents: write
 
-jobs:
-  update-activity:
-    runs-on: ubuntu-latest
+concurrency:
+  group: update-activity-radar
+  cancel-in-progress: false
 
+jobs:
+  update:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout profile
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Generate activity graphic
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require("fs");
-
-            const query = `
-              query($login: String!) {
-                user(login: $login) {
-                  contributionsCollection {
-                    totalCommitContributions
-                    totalPullRequestContributions
-                    totalPullRequestReviewContributions
-                    totalIssueContributions
-                  }
-                }
-              }
-            `;
-
-            const data = await github.graphql(query, {
-              login: context.repo.owner
-            });
-
-            const c = data.user.contributionsCollection;
-            const commits = c.totalCommitContributions;
-            const prs = c.totalPullRequestContributions;
-            const reviews = c.totalPullRequestReviewContributions;
-            const issues = c.totalIssueContributions;
-            const total = commits + prs + reviews + issues;
-
-            const pct = (n) => total ? Math.round((n / total) * 100) : 0;
-
-            let svg = fs.readFileSync("assets/github-activity.svg", "utf8");
-
-            svg = svg
-              .replaceAll("{{TOTAL}}", String(total))
-              .replaceAll("{{COMMIT_PCT}}", String(pct(commits)))
-              .replaceAll("{{PR_PCT}}", String(pct(prs)))
-              .replaceAll("{{REVIEW_PCT}}", String(pct(reviews)))
-              .replaceAll("{{ISSUE_PCT}}", String(pct(issues)));
-
-            fs.writeFileSync("assets/github-activity.svg", svg);
-
-      - name: Commit updated graphic
+      - name: Generate assets/github-activity-radar.svg
+        env:
+          # Optional: add a PAT as the PROFILE_STATS_TOKEN secret (scopes: read:user)
+          # to include private contributions. Falls back to the built-in token.
+          GH_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_LOGIN: ${{ github.repository_owner }}
         run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+          from datetime import datetime, timedelta, timezone
+          from html import escape
+          from xml.dom import minidom
+
+          OUT = "assets/github-activity-radar.svg"
+          API = os.environ.get("GITHUB_GRAPHQL_URL", "https://api.github.com/graphql")
+
+          QUERY = """
+          query($login: String!, $from: DateTime!, $to: DateTime!) {
+            user(login: $login) {
+              contributionsCollection(from: $from, to: $to) {
+                totalCommitContributions
+                totalIssueContributions
+                totalPullRequestContributions
+                totalPullRequestReviewContributions
+              }
+            }
+          }
+          """
+
+
+          def fetch_counts(login, token):
+              fmt = "%Y-%m-%dT%H:%M:%SZ"
+              now = datetime.now(timezone.utc).replace(microsecond=0)
+              start = now - timedelta(days=364)
+              payload = json.dumps({
+                  "query": QUERY,
+                  "variables": {
+                      "login": login,
+                      "from": start.strftime(fmt),
+                      "to": now.strftime(fmt),
+                  },
+              }).encode()
+              req = urllib.request.Request(
+                  API,
+                  data=payload,
+                  headers={
+                      "Authorization": "Bearer " + token,
+                      "Content-Type": "application/json",
+                      "User-Agent": "activity-radar-workflow",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as resp:
+                      body = json.load(resp)
+              except urllib.error.HTTPError as err:
+                  detail = err.read().decode(errors="replace")[:300]
+                  sys.exit("GitHub API returned HTTP %s: %s" % (err.code, detail))
+              if body.get("errors"):
+                  sys.exit("GraphQL errors: %s" % json.dumps(body["errors"])[:500])
+              user = (body.get("data") or {}).get("user")
+              if not user:
+                  sys.exit("No user data returned for %r" % login)
+              c = user["contributionsCollection"]
+              return {
+                  "reviews": int(c["totalPullRequestReviewContributions"]),
+                  "prs": int(c["totalPullRequestContributions"]),
+                  "commits": int(c["totalCommitContributions"]),
+                  "issues": int(c["totalIssueContributions"]),
+              }
+
+
+          def render(counts):
+              W, H = 480, 360
+              CX, CY, R = 240, 182, 100
+              total = sum(counts.values())
+              peak = max(counts.values())
+
+              def dist(n):
+                  return R * n / peak if peak else 0.0
+
+              def pct(n):
+                  return "%.1f%%" % (100.0 * n / total) if total else "0.0%"
+
+              def stat(n):
+                  return "%s \u00b7 %s" % (format(n, ","), pct(n))
+
+              top = (CX, CY - dist(counts["reviews"]))
+              right = (CX + dist(counts["issues"]), CY)
+              bottom = (CX, CY + dist(counts["prs"]))
+              left = (CX - dist(counts["commits"]), CY)
+              poly = " ".join("%.1f,%.1f" % p for p in (top, right, bottom, left))
+
+              def diamond(r):
+                  return "%d,%d %d,%d %d,%d %d,%d" % (
+                      CX, CY - r, CX + r, CY, CX, CY + r, CX - r, CY)
+
+              dots = "\n".join(
+                  '  <circle cx="%.1f" cy="%.1f" r="4.5" fill="#3fb950" '
+                  'stroke="#0d1117" stroke-width="2"/>' % p
+                  for p in (top, right, bottom, left)
+              )
+              gap = 14
+              lines = [
+                  '<?xml version="1.0" encoding="UTF-8"?>',
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" '
+                  'viewBox="0 0 %d %d" role="img" aria-labelledby="t d">' % (W, H, W, H),
+                  '  <title id="t">GitHub contribution activity</title>',
+                  '  <desc id="d">Commits %d, pull requests %d, issues %d and code reviews %d '
+                  'over the last 12 months.</desc>' % (
+                      counts["commits"], counts["prs"], counts["issues"], counts["reviews"]),
+                  '  <rect x="0.5" y="0.5" width="%d" height="%d" rx="6" fill="#0d1117" '
+                  'stroke="#30363d"/>' % (W - 1, H - 1),
+                  '  <g font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', '
+                  'Helvetica, Arial, sans-serif">',
+                  '  <text x="24" y="32" font-size="13" font-weight="600" fill="#e6edf3">'
+                  'Contribution activity</text>',
+                  '  <text x="%d" y="32" font-size="12" fill="#8b949e" text-anchor="end">'
+                  'Last 12 months</text>' % (W - 24),
+                  '  <polygon points="%s" fill="none" stroke="#21262d"/>' % diamond(R),
+                  '  <polygon points="%s" fill="none" stroke="#21262d"/>' % diamond(R // 2),
+                  '  <line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#30363d"/>' % (
+                      CX, CY - R, CX, CY + R),
+                  '  <line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#30363d"/>' % (
+                      CX - R, CY, CX + R, CY),
+                  '  <polygon points="%s" fill="#3fb950" fill-opacity="0.18" stroke="#3fb950" '
+                  'stroke-width="1.5" stroke-linejoin="round"/>' % poly,
+                  dots,
+                  '  <circle cx="%d" cy="%d" r="2" fill="#8b949e"/>' % (CX, CY),
+                  # top: Code reviews
+                  '  <text x="%d" y="%d" font-size="13" font-weight="600" fill="#e6edf3" '
+                  'text-anchor="middle">Code reviews</text>' % (CX, CY - R - 32),
+                  '  <text x="%d" y="%d" font-size="12" fill="#3fb950" text-anchor="middle">'
+                  '%s</text>' % (CX, CY - R - 16, escape(stat(counts["reviews"]))),
+                  # bottom: Pull requests
+                  '  <text x="%d" y="%d" font-size="13" font-weight="600" fill="#e6edf3" '
+                  'text-anchor="middle">Pull requests</text>' % (CX, CY + R + 26),
+                  '  <text x="%d" y="%d" font-size="12" fill="#3fb950" text-anchor="middle">'
+                  '%s</text>' % (CX, CY + R + 42, escape(stat(counts["prs"]))),
+                  # left: Commits
+                  '  <text x="%d" y="%d" font-size="13" font-weight="600" fill="#e6edf3" '
+                  'text-anchor="end">Commits</text>' % (CX - R - gap, CY - 3),
+                  '  <text x="%d" y="%d" font-size="12" fill="#3fb950" text-anchor="end">'
+                  '%s</text>' % (CX - R - gap, CY + 14, escape(stat(counts["commits"]))),
+                  # right: Issues
+                  '  <text x="%d" y="%d" font-size="13" font-weight="600" fill="#e6edf3" '
+                  'text-anchor="start">Issues</text>' % (CX + R + gap, CY - 3),
+                  '  <text x="%d" y="%d" font-size="12" fill="#3fb950" text-anchor="start">'
+                  '%s</text>' % (CX + R + gap, CY + 14, escape(stat(counts["issues"]))),
+                  '  <text x="%d" y="%d" font-size="10" fill="#8b949e" text-anchor="middle">'
+                  'Share of the four categories. Distance from center is proportional to count.'
+                  '</text>' % (CX, H - 14),
+                  '  </g>',
+                  '</svg>',
+              ]
+              return "\n".join(lines) + "\n"
+
+
+          def main():
+              counts = fetch_counts(os.environ["GH_LOGIN"], os.environ["GH_TOKEN"])
+              svg = render(counts)
+              minidom.parseString(svg.encode("utf-8"))  # abort on invalid XML
+              os.makedirs(os.path.dirname(OUT), exist_ok=True)
+              with open(OUT, "w", encoding="utf-8") as fh:
+                  fh.write(svg)
+              print("Wrote %s: %s" % (OUT, counts))
+
+
+          if __name__ == "__main__":
+              main()
+          PY
+
+      - name: Commit changes
+        run: |
+          if [ -z "$(git status --porcelain -- assets/github-activity-radar.svg)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/github-activity.svg
-          git diff --cached --quiet || git commit -m "chore: update GitHub activity"
+          git add assets/github-activity-radar.svg
+          git commit -m "chore: update activity radar"
           git push
