@@ -46,6 +46,7 @@ Smaller work includes an Android app (SRM Insider) and console programs in Java 
 
 Work in existing codebases, linked to the upstream projects:
 
+- [Apache SkyWalking Java agent](https://github.com/apache/skywalking-java) — merged [PR #832](https://github.com/apache/skywalking-java/pull/832), fixing [apache/skywalking#14097](https://github.com/apache/skywalking/issues/14097), where the HttpClient 5.x plugin closed the caller thread's active span. Reworked the async exit-span lifecycle so each request's span is finished by reference exactly once, made HttpClient 5.4+ async requests traced, and extended the plugin test scenario to HttpClient 5.0–5.6. Ships in agent 9.8.0.
 - [spring-lens](https://github.com/sdlc-pro/spring-lens) — observability and diagnostics tool for Spring Boot applications
 - [nv-i18n](https://github.com/foundationsedge/nv-i18n) — Java library of ISO country, language, script and currency code enums
 - Work around `BeanProxyInfoInspector`
