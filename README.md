@@ -3,7 +3,8 @@
 **Java backend developer · B.Tech Computer Science at SRMIST**
 
 I build backend systems with Java and Spring Boot: multi-tenant SaaS, event-driven pipelines with
-Kafka, and retrieval-augmented services around LLMs. I care about the parts that make them hold up:
+Kafka, retrieval-augmented services around LLMs, and distributed systems from first principles (a
+Raft-based replicated key-value store). I care about the parts that make them hold up:
 tests against real infrastructure, measured quality, cost control and observability. I also
 contribute fixes to open-source Java projects such as Apache SkyWalking and Keycloak.
 
@@ -29,6 +30,23 @@ reviews pull requests from GitHub webhooks and serves AI coding agents as an **M
 - **Operated:** Prometheus metrics, a 30-panel Grafana dashboard, a production Compose stack behind Caddy
 
 `Java 25` `Spring Boot 4` `Spring AI` `PostgreSQL + pgvector` `Kafka` `Redis` `Resilience4j` `Testcontainers`
+
+### [RaftKV](https://github.com/Ayush0612005/raftkv): a replicated key-value store on Raft, from scratch
+
+**[Source, design reports and benchmarks](https://github.com/Ayush0612005/raftkv)**
+
+<a href="https://github.com/Ayush0612005/raftkv#results"><img src="https://raw.githubusercontent.com/Ayush0612005/raftkv/main/docs/bench/throughput.svg" alt="RaftKV write throughput vs concurrent clients for 3-node and 5-node clusters" width="720"></a>
+
+A fault-tolerant key-value store built on the Raft consensus algorithm in plain Java (no framework): the same
+problems etcd and Kafka's KRaft solve internally. Every phase has a written design report and a test gate.
+
+- **Consensus:** leader election, log replication with accelerated backtracking, the commit rule from §5.4.2, snapshots and InstallSnapshot
+- **Own storage engine:** append-only write-ahead log with CRC32C records, group-commit fsync and torn-write recovery; atomic snapshot files
+- **Exactly-once and linearizable:** every operation goes through the log; a per-client dedup table (kept in snapshots) makes retries safe
+- **Tested against failure:** a simulated network that drops, delays, reorders and partitions messages and crashes nodes; a linearizability checker; CI kills and partitions a live Docker cluster
+- **Measured:** up to **16K writes/s** on 3 nodes with fsync; group commit scales throughput ~40x from 1 to 128 clients
+
+`Java 25` `gRPC` `Protocol Buffers` `Virtual threads` `Docker Compose` `JUnit 5` `JMH` `GitHub Actions`
 
 ### [ClubHub](https://github.com/Ayush0612005/clubhub-api): multi-tenant SaaS for college clubs
 
@@ -81,11 +99,14 @@ notifications for college clubs, plus a public directory of the 75 clubs at SRM 
 **AI and retrieval**  
 `RAG` `pgvector` `Hybrid search` `Embeddings` `Ollama` `Claude API` `MCP`
 
+**Distributed systems**  
+`Raft consensus` `Write-ahead logging` `Snapshots` `gRPC` `Protocol Buffers` `Fault injection` `Linearizability testing`
+
 **Data and messaging**  
 `PostgreSQL` `MySQL` `MongoDB` `Redis` `Apache Kafka`
 
 **Testing, DevOps and cloud**  
-`JUnit 5` `Mockito` `Testcontainers` `Docker` `GitHub Actions` `Prometheus` `Grafana` `AWS S3 / SES` `Render` `Vercel`
+`JUnit 5` `Mockito` `Testcontainers` `JMH` `Docker` `GitHub Actions` `Prometheus` `Grafana` `AWS S3 / SES` `Render` `Vercel`
 
 ---
 
@@ -111,7 +132,7 @@ B.Tech, Computer Science and Engineering · 2025–2029 · CGPA 9.2 / 10
 
 ## Currently learning
 
-System design · Distributed systems · Evaluating RAG systems · AWS · Advanced DSA
+System design · Distributed systems (consensus, storage engines) · Evaluating RAG systems · AWS · Advanced DSA
 
 ---
 
