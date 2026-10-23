@@ -6,9 +6,9 @@ I build backend systems with Java and Spring Boot: multi-tenant SaaS, event-driv
 Kafka, retrieval-augmented services around LLMs, and distributed systems from first principles (a
 Raft-based replicated key-value store). I care about the parts that make them hold up:
 tests against real infrastructure, measured quality, cost control and observability. I also
-contribute fixes to open-source Java projects such as Apache SkyWalking and Keycloak.
+contribute fixes to open-source Java projects such as OpenTelemetry, Apache SkyWalking and Keycloak.
 
-`CGPA 9.2 / 10` · `1st Place, NitroStack Hackathon` · `5 upstream PRs, 3 merged` · `170+ LeetCode`
+`CGPA 9.2 / 10` · `1st Place, NitroStack Hackathon` · `5 upstream PRs, 4 merged` · `170+ LeetCode`
 
 ---
 
@@ -82,7 +82,7 @@ notifications for college clubs, plus a public directory of the 75 clubs at SRM 
 |---|---|---|
 | [Apache SkyWalking Java agent](https://github.com/apache/skywalking-java) | [#832](https://github.com/apache/skywalking-java/pull/832): fixed [apache/skywalking#14097](https://github.com/apache/skywalking/issues/14097), where the HttpClient 5.x plugin could stop the caller's active span. Reworked the async exit-span lifecycle, enabled tracing for HttpClient 5.4+ and extended tests to 5.0–5.6. Ships in agent 9.8.0. | ✅ Merged |
 | [Keycloak](https://github.com/keycloak/keycloak) | [#53517](https://github.com/keycloak/keycloak/pull/53517): fixed [#53456](https://github.com/keycloak/keycloak/issues/53456), where time-based policies saved from the Admin Console made every permission using them fail with HTTP 500. Blank repeat fields now count as unset, with regression tests. | ✅ Merged |
-| [OpenTelemetry Java Instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation) | [#20442](https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/20442): removes a redundant span-context conversion in the API bridge ([#20340](https://github.com/open-telemetry/opentelemetry-java-instrumentation/issues/20340)) by unwrapping bridged spans and lazily caching the immutable `SpanContext`. | 🔄 In review |
+| [OpenTelemetry Java Instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation) | [#20442](https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/20442): removes a redundant span-context conversion in the API bridge ([#20340](https://github.com/open-telemetry/opentelemetry-java-instrumentation/issues/20340)) by unwrapping bridged spans and lazily caching the immutable `SpanContext`. In an independent JMH benchmark, `getSpanContext()` on a bridged span went from ~135 ns to 1 ns and `Context.with(span)` became ~3x faster. | ✅ Merged |
 | [Apache Pulsar Connectors](https://github.com/apache/pulsar-connectors) | [#145](https://github.com/apache/pulsar-connectors/pull/145): regression tests proving the Redis sink keeps its socket options in cluster mode ([#131](https://github.com/apache/pulsar-connectors/issues/131)). | 🔄 In review |
 | [Spring Lens](https://github.com/sdlc-pro/spring-lens) | [#312](https://github.com/sdlc-pro/spring-lens/pull/312): added `BeanProxyInfoInspector`, surfacing Spring bean proxy details in the Bean Explorer. | ✅ Merged |
 
