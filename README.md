@@ -138,4 +138,4 @@ System design · Distributed systems (consensus, storage engines) · Evaluating 
 
 ## Say hi
 
-[LinkedIn](https://www.linkedin.com/in/ayush-kulshreshtha-0066661b9) · [Email](mailto:ayushkulshreshtha37@gmail.com) · [GitHub](https://github.com/Ayush0612005)
+[LinkedIn](https://www.linkedin.com/in/ayush-kulshreshtha-dev) · [Email](mailto:ayushkulshreshtha37@gmail.com) · [GitHub](https://github.com/Ayush0612005)
