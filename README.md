@@ -6,7 +6,7 @@ I build backend systems with Java and Spring Boot: multi-tenant SaaS, event-driv
 Kafka, retrieval-augmented services around LLMs, and distributed systems from first principles (a
 Raft-based replicated key-value store). I care about the parts that make them hold up:
 tests against real infrastructure, measured quality, cost control and observability. I also
-contribute fixes to open-source Java projects such as OpenTelemetry, Spring AI, Apache Camel, Apache SkyWalking and Keycloak.
+contribute fixes to open-source Java projects such as Apache Camel, OpenTelemetry, Apache SkyWalking, Spring AI and Keycloak.
 
 `CGPA 9.2 / 10` · `1st Place, NitroStack Hackathon` · `9 upstream PRs merged` · `170+ LeetCode`
 
