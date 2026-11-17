@@ -6,9 +6,9 @@ I build backend systems with Java and Spring Boot: multi-tenant SaaS, event-driv
 Kafka, retrieval-augmented services around LLMs, and distributed systems from first principles (a
 Raft-based replicated key-value store). I care about the parts that make them hold up:
 tests against real infrastructure, measured quality, cost control and observability. I also
-contribute fixes to open-source Java projects such as OpenTelemetry, Spring AI, Apache SkyWalking and Keycloak.
+contribute fixes to open-source Java projects such as OpenTelemetry, Spring AI, Apache Camel, Apache SkyWalking and Keycloak.
 
-`CGPA 9.2 / 10` · `1st Place, NitroStack Hackathon` · `7 upstream PRs merged` · `170+ LeetCode`
+`CGPA 9.2 / 10` · `1st Place, NitroStack Hackathon` · `8 upstream PRs merged` · `170+ LeetCode`
 
 ---
 
@@ -85,6 +85,7 @@ notifications for college clubs, plus a public directory of the 75 clubs at SRM 
 | [OpenTelemetry Java Instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation) | [#20442](https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/20442): removes a redundant span-context conversion in the API bridge ([#20340](https://github.com/open-telemetry/opentelemetry-java-instrumentation/issues/20340)) by unwrapping bridged spans and lazily caching the immutable `SpanContext`. In an independent JMH benchmark, `getSpanContext()` on a bridged span went from ~135 ns to 1 ns and `Context.with(span)` became ~3x faster. | ✅ Merged |
 | [Apache Pulsar Connectors](https://github.com/apache/pulsar-connectors) | [#145](https://github.com/apache/pulsar-connectors/pull/145): regression tests proving the Redis sink keeps its socket options in cluster mode, plus a small refactor that makes the client options testable ([#131](https://github.com/apache/pulsar-connectors/issues/131)). [#156](https://github.com/apache/pulsar-connectors/pull/156): moved `RedisSinkTest` from an embedded Redis binary to a Testcontainers image, made it read the written value back, and added a password-protected case ([#112](https://github.com/apache/pulsar-connectors/issues/112)). | ✅ Merged |
 | [Spring AI](https://github.com/spring-projects/spring-ai) | [#7350](https://github.com/spring-projects/spring-ai/pull/7350): added opt-in bulk upserts to `MongoDBAtlasVectorStore` ([#7285](https://github.com/spring-projects/spring-ai/issues/7285)). Writes go as ordered bulk replacements in bounded batches, keeping per-document save semantics on failure; 15–22x faster for 2,000 documents on Atlas local. | ✅ Merged |
+| [Apache Camel](https://github.com/apache/camel) | [#30255](https://github.com/apache/camel/pull/30255): fixed [CAMEL-26893](https://issues.apache.org/jira/browse/CAMEL-26893), where adding routes with explicit ids slowed down quadratically: removing a route walked the endpoints of every route even when nothing was removed. Ships in Camel 4.24.0. | ✅ Merged |
 | [Spring Lens](https://github.com/sdlc-pro/spring-lens) | [#312](https://github.com/sdlc-pro/spring-lens/pull/312): added `BeanProxyInfoInspector`, surfacing Spring bean proxy details in the Bean Explorer. | ✅ Merged |
 
 ---
